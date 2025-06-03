@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEA Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        .sidebar { width: 256px; background: #1e293b; color: white; height: 100vh; position: fixed; }
+        .main-content { margin-left: 256px; min-height: 100vh; background: #f8fafc; }
+        .nav-item { display: block; width: 100%; text-align: left; padding: 12px 16px; margin: 4px 0; border-radius: 8px; transition: all 0.2s; }
+        .nav-item:hover { background: #374151; }
+        .nav-item.active { background: #2563eb; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        .btn-primary { background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #6b7280; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-danger { background: #dc2626; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; }
+        .input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; width: 100%; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f9fafb; font-weight: 600; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 24px; border-radius: 8px; width: 400px; max-width: 90vw; }
+        .hidden { display: none; }
+        .progress-bar { width: 100%; background: #e5e7eb; border-radius: 9999px; height: 12px; }
+        .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.3s; }
+        .stat-card { padding: 24px; border-radius: 8px; border: 2px solid; }
+        .stat-blue { border-color: #bfdbfe; background: #eff6ff; }
+        .stat-green { border-color: #bbf7d0; background: #f0fdf4; }
+        .stat-purple { border-color: #e9d5ff; background: #faf5ff; }
+        .stat-orange { border-color: #fed7aa; background: #fff7ed; }
+        .tab-button { padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; }
+        .tab-active { background: white; color: #2563eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tab-inactive { color: #6b7280; }
+        .tab-inactive:hover { color: #374151; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div style="padding: 24px; border-bottom: 1px solid #374151;">
+            <h1 style="font-size: 20px; font-weight: bold; margin: 0;">📚 NEA Tracker</h1>
+        </div>
+        <nav style="padding: 16px;">
+            <button class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+                <span style="margin-right: 12px;">📊</span>Dashboard
+            </button>
+            <button class="nav-item" onclick="showPage('students')" id="nav-students">
+                <span style="margin-right: 12px;">👥</span>Students
+            </button>
+            <button class="nav-item" onclick="showPage('progress')" id="nav-progress">
+                <span style="margin-right: 12px;">📈</span>Progress
+            </button>
+            <button class="nav-item" onclick="showPage('nea-page-tracker')" id="nav-nea-page-tracker">
+                <span style="margin-right: 12px;">📋</span>NEA Page Tracker
+            </button>
+            <button class="nav-item" onclick="showPage('moderation')" id="nav-moderation">
+                <span style="margin-right: 12px;">⚖️</span>Moderation
+            </button>
+            <button class="nav-item" onclick="showPage('analytics')" id="nav-analytics">
+                <span style="margin-right: 12px;">📊</span>Analytics
+            </button>
+            <button class="nav-item" onclick="showPage('deadlines')" id="nav-deadlines">
+                <span style="margin-right: 12px;">📅</span>Deadlines
+            </button>
+            <button class="nav-item" onclick="showPage('settings')" id="nav-settings">
+                <span style="margin-right: 12px;">⚙️</span>Settings
+            </button>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page">
+            <div style="padding: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <div>
+                        <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0;">Dashboard</h1>
+                        <p style="color: #64748b; margin: 8px 0 0 0;">Welcome to the NEA Coursework Tracker</p>
+                    </div>
+                    <button class="btn-primary" onclick="window.print()">Print Report</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                    <div class="card stat-card stat-blue">
+                        <h3 style="font-size: 14px; font-weight: 500; color: #64748b; margin: 0 0 8px 0;">Total Students</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #1e293b; margin: 0 0 4px 0;" id="total-students">5</p>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Across all classes</p>
+                    </div>
+                    <div class="card stat-card stat-green">
+                        <h3 style="font-size: 14px; font-weight: 500; color: #64748b; margin: 0 0 8px 0;">Overall Progress</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #1e293b; margin: 0 0 4px 0;" id="avg-progress">68%</p>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Average completion</p>
+                    </div>
+                    <div class="card stat-card stat-purple">
+                        <h3 style="font-size: 14px; font-weight: 500; color: #64748b; margin: 0 0 8px 0;">Students On Target</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #1e293b; margin: 0 0 4px 0;" id="students-on-target">3/5</p>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">60% meeting targets</p>
+                    </div>
+                    <div class="card stat-card stat-orange">
+                        <h3 style="font-size: 14px; font-weight: 500; color: #64748b; margin: 0 0 8px 0;">Improvement Rate</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #1e293b; margin: 0 0 4px 0;">+12%</p>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">Positive trend</p>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">Progress by NEA Section</h2>
+                    <p style="color: #64748b; margin: 0 0 24px 0;">Average completion percentage across all students</p>
+                    <div id="progress-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Page -->
+        <div id="page-students" class="page hidden">
+            <div style="padding: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0;">Students</h1>
+                    <button class="btn-primary" onclick="showAddStudentModal()">Add Student</button>
+                </div>
+
+                <div class="card" style="overflow: hidden;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>NEA Total</th>
+                                <th>Mock 1</th>
+                                <th>Mock 2</th>
+                                <th>Teams Link</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Page -->
+        <div id="page-progress" class="page hidden">
+            <div style="padding: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                    <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0;">Progress Tracking</h1>
+                    <button class="btn-primary" onclick="window.print()">Print Progress</button>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <div style="display: flex; gap: 4px; background: #f3f4f6; padding: 4px; border-radius: 8px; width: fit-content;">
+                        <button class="tab-button tab-active" onclick="showProgressTab('individual')" id="tab-individual">Individual Progress</button>
+                        <button class="tab-button tab-inactive" onclick="showProgressTab('overall')" id="tab-overall">Overall Progress</button>
+                    </div>
+                </div>
+
+                <div id="progress-individual" class="progress-tab">
+                    <div class="card" style="overflow: hidden;">
+                        <div style="overflow-x: auto;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="position: sticky; left: 0; background: #f9fafb;">Student</th>
+                                        <th>Section A</th>
+                                        <th>Section B</th>
+                                        <th>Section C</th>
+                                        <th>Section D</th>
+                                        <th>Section E</th>
+                                        <th>Section F</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="progress-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="progress-overall" class="progress-tab hidden">
+                    <div class="card" style="padding: 16px; margin-bottom: 24px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px;">
+                            Mock Grade Improvement: <span id="improvement-value">15</span>%
+                        </label>
+                        <input type="range" min="0" max="50" value="15" style="width: 100%;" oninput="updateImprovement(this.value)">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-top: 4px;">
+                            <span>0%</span>
+                            <span>25%</span>
+                            <span>50%</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="overflow: hidden;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>NEA Total</th>
+                                    <th>Highest Mock</th>
+                                    <th>Predicted Exam</th>
+                                    <th>Overall Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overall-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEA Page Tracker -->
+        <div id="page-nea-page-tracker" class="page hidden">
+            <div style="padding: 32px;">
+                <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0 0 32px 0;">NEA Page Tracker</h1>
+                <div class="card" style="padding: 24px;">
+                    <p style="color: #64748b;">Track which pages students have completed for their NEA projects.</p>
+                    <div style="margin-top: 24px;">
+                        <div class="card" style="overflow: hidden;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="position: sticky; left: 0; background: #f9fafb;">Student</th>
+                                        <th>Page 1-5</th>
+                                        <th>Page 6-10</th>
+                                        <th>Page 11-15</th>
+                                        <th>Page 16-20</th>
+                                        <th>Page 21-25</th>
+                                        <th>Page 26-30</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="page-tracker-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moderation Page -->
+        <div id="page-moderation" class="page hidden">
+            <div style="padding: 32px;">
+                <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0 0 32px 0;">Moderation</h1>
+                <div class="card" style="padding: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">Moderation Management</h2>
+                    <p style="color: #64748b; margin: 0 0 24px 0;">Select students for moderation and track the process.</p>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <button class="btn-primary" onclick="selectRandomStudents()">Select Random Students</button>
+                        <button class="btn-secondary" onclick="clearModeration()" style="margin-left: 8px;">Clear Selection</button>
+                    </div>
+
+                    <div class="card" style="overflow: hidden;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Class</th>
+                                    <th>Selected for Moderation</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moderation-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Page -->
+        <div id="page-analytics" class="page hidden">
+            <div style="padding: 32px;">
+                <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0 0 32px 0;">Analytics</h1>
+                <div class="card" style="padding: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">Performance Analytics</h2>
+                    <p style="color: #64748b;">Detailed analytics and reporting features.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px;">
+                        <div class="card" style="padding: 16px;">
+                            <h3 style="font-weight: 600; margin: 0 0 12px 0;">Class Performance</h3>
+                            <div id="class-analytics"></div>
+                        </div>
+                        <div class="card" style="padding: 16px;">
+                            <h3 style="font-weight: 600; margin: 0 0 12px 0;">Section Progress</h3>
+                            <div id="section-analytics"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deadlines Page -->
+        <div id="page-deadlines" class="page hidden">
+            <div style="padding: 32px;">
+                <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0 0 32px 0;">Deadlines</h1>
+                <div class="card" style="padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Deadline Management</h2>
+                        <button class="btn-primary" onclick="showAddDeadlineModal()">Add Deadline</button>
+                    </div>
+                    
+                    <div class="card" style="overflow: hidden;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Due Date</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deadlines-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="page-settings" class="page hidden">
+            <div style="padding: 32px;">
+                <h1 style="font-size: 30px; font-weight: bold; color: #1e293b; margin: 0 0 32px 0;">Settings</h1>
+                <div class="card" style="padding: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">Application Settings</h2>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-weight: 600; margin: 0 0 12px 0;">Data Management</h3>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn-primary" onclick="exportData()">Export Data</button>
+                            <button class="btn-secondary" onclick="importData()">Import Data</button>
+                            <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-weight: 600; margin: 0 0 12px 0;">Grade Boundaries</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div>
+                                <label style="display: block; font-weight: 500; margin-bottom: 4px;">Grade 9</label>
+                                <input type="number" class="input" value="80" id="grade-9">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 500; margin-bottom: 4px;">Grade 7</label>
+                                <input type="number" class="input" value="65" id="grade-7">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 500; margin-bottom: 4px;">Grade 5</label>
+                                <input type="number" class="input" value="50" id="grade-5">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 500; margin-bottom: 4px;">Grade 4</label>
+                                <input type="number" class="input" value="35" id="grade-4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div id="student-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 style="font-size: 20px; font-weight: bold; margin: 0 0 16px 0;" id="student-modal-title">Add Student</h2>
+            <form id="student-form">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 4px;">Name</label>
+                    <input type="text" class="input" id="student-name" required>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 4px;">Class</label>
+                    <input type="text" class="input" id="student-class" required>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 4px;">NEA Total</label>
+                    <input type="number" class="input" id="student-nea" min="0" max="100" value="0">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 4px;">Mock 1</label>
+                    <input type="number" class="input" id="student-mock1" min="0" max="100" value="0">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 4px;">Mock 2</label>
+                    <input type="number" class="input" id="student-mock2" min="0" max="100" value="0">
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 4px;">Teams Link</label>
+                    <input type="url" class="input" id="student-teams" placeholder="https://teams.microsoft.com/...">
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">Save Student</button>
+                    <button type="button" class="btn-secondary" style="flex: 1;" onclick="hideStudentModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let students = JSON.parse(localStorage.getItem('students') || '[]');
+        let neaProgress = JSON.parse(localStorage.getItem('neaProgress') || '{}');
+        let improvementPercentage = parseInt(localStorage.getItem('improvementPercentage') || '15');
+        let deadlines = JSON.parse(localStorage.getItem('deadlines') || '[]');
+        let moderationList = JSON.parse(localStorage.getItem('moderationList') || '[]');
+        let pageProgress = JSON.parse(localStorage.getItem('pageProgress') || '{}');
+
+        // Initialize with sample data if empty
+        if (students.length === 0) {
+            students = [
+                { id: 1, name: "Alice Johnson", class: "11A", neaTotal: 45, mock1: 67, mock2: 72, teamsLink: "" },
+                { id: 2, name: "Bob Smith", class: "11A", neaTotal: 38, mock1: 58, mock2: 65, teamsLink: "" },
+                { id: 3, name: "Charlie Brown", class: "11B", neaTotal: 52, mock1: 74, mock2: 78, teamsLink: "" },
+                { id: 4, name: "Diana Prince", class: "11B", neaTotal: 41, mock1: 62, mock2: 69, teamsLink: "" },
+                { id: 5, name: "Eve Wilson", class: "11C", neaTotal: 48, mock1: 71, mock2: 75, teamsLink: "" }
+            ];
+            
+            neaProgress = {
+                1: { sectionA: 85, sectionB: 78, sectionC: 72, sectionD: 65, sectionE: 48, sectionF: 35 },
+                2: { sectionA: 75, sectionB: 68, sectionC: 62, sectionD: 55, sectionE: 38, sectionF: 25 },
+                3: { sectionA: 95, sectionB: 88, sectionC: 82, sectionD: 75, sectionE: 58, sectionF: 45 },
+                4: { sectionA: 80, sectionB: 73, sectionC: 67, sectionD: 60, sectionE: 43, sectionF: 30 },
+                5: { sectionA: 90, sectionB: 83, sectionC: 77, sectionD: 70, sectionE: 53, sectionF: 40 }
+            };
+
+            pageProgress = {
+                1: { pages1_5: 100, pages6_10: 80, pages11_15: 60, pages16_20: 40, pages21_25: 20, pages26_30: 0 },
+                2: { pages1_5: 100, pages6_10: 100, pages11_15: 70, pages16_20: 30, pages21_25: 10, pages26_30: 0 },
+                3: { pages1_5: 100, pages6_10: 100, pages11_15: 100, pages16_20: 80, pages21_25: 60, pages26_30: 40 },
+                4: { pages1_5: 100, pages6_10: 90, pages11_15: 50, pages16_20: 20, pages21_25: 0, pages26_30: 0 },
+                5: { pages1_5: 100, pages6_10: 100, pages11_15: 90, pages16_20: 70, pages21_25: 50, pages26_30: 20 }
+            };
+
+            deadlines = [
+                { id: 1, task: "Section A Complete", dueDate: "2025-06-15", priority: "High", status: "Pending" },
+                { id: 2, task: "First Draft Review", dueDate: "2025-07-01", priority: "Medium", status: "Pending" },
+                { id: 3, task: "Final Submission", dueDate: "2025-08-15", priority: "High", status: "Pending" }
+            ];
+
+            saveData();
+        }
+
+        let editingStudentId = null;
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('neaProgress', JSON.stringify(neaProgress));
+            localStorage.setItem('improvementPercentage', improvementPercentage.toString());
+            localStorage.setItem('deadlines', JSON.stringify(deadlines));
+            localStorage.setItem('moderationList', JSON.stringify(moderationList));
+            localStorage.setItem('pageProgress', JSON.stringify(pageProgress));
+        }
+
+        // Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            
+            // Show selected page
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById('nav-' + pageId).classList.add('active');
+            
+            // Refresh page content
+            switch(pageId) {
+                case 'dashboard':
+                    updateDashboard();
+                    break;
+                case 'students':
+                    updateStudentsTable();
+                    break;
+                case 'progress':
+                    updateProgressTables();
+                    break;
+                case 'nea-page-tracker':
+                    updatePageTracker();
+                    break;
+                case 'moderation':
+                    updateModerationTable();
+                    break;
+                case 'analytics':
+                    updateAnalytics();
+                    break;
+                case 'deadlines':
+                    updateDeadlinesTable();
+                    break;
+            }
+        }
+
+        // Dashboard functions
+        function updateDashboard() {
+            const totalStudents = students.length;
+            const avgProgress = totalStudents > 0 ? Math.round(
+                students.reduce((sum, student) => {
+                    const progress = neaProgress[student.id];
+                    if (!progress) return sum;
+                    const avg = Object.values(progress).reduce((a, b) => a + b, 0) / 6;
+                    return sum + avg;
+                }, 0) / totalStudents
+            ) : 0;
+
+            const studentsOnTarget = students.filter(student => {
+                const progress = neaProgress[student.id];
+                if (!progress) return false;
+                const avg = Object.values(progress).reduce((a, b) => a + b, 0) / 6;
+                return avg >= 70;
+            }).length;
+
+            document.getElementById('total-students').textContent = totalStudents;
+            document.getElementById('avg-progress').textContent = avgProgress + '%';
+            document.getElementById('students-on-target').textContent = `${studentsOnTarget}/${totalStudents}`;
+
+            updateProgressChart();
+        }
+
+        function updateProgressChart() {
+            const sections = [
+                { key: 'sectionA', name: 'Section A: Identifying & Investigating' },
+                { key: 'sectionB', name: 'Section B: Producing a Design Brief' },
+                { key: 'sectionC', name: 'Section C: Generating Design Ideas' },
+                { key: 'sectionD', name: 'Section D: Developing Design Ideas' },
+                { key: 'sectionE', name: 'Section E: Realising Design Ideas' },
+                { key: 'sectionF', name: 'Section F: Analysing & Evaluating' }
+            ];
+
+            const chartHtml = sections.map(section => {
+                const percentage = getAverageForSection(section.key);
+                const colorClass = percentage >= 70 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+                
+                return `
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 500;">${section.name}</span>
+                            <span style="font-weight: 600;">${percentage}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%; background-color: ${colorClass};"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('progress-chart').innerHTML = chartHtml;
+        }
+
+        function getAverageForSection(sectionKey) {
+            if (students.length === 0) return 0;
+            const total = students.reduce((sum, student) => {
+                const progress = neaProgress[student.id];
+                return sum + (progress ? progress[sectionKey] || 0 : 0);
+            }, 0);
+            return Math.round(total / students.length);
+        }
+
+        // Students functions
+        function updateStudentsTable() {
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = students.map(student => `
+                <tr>
+                    <td style="font-weight: 500;">${student.name}</td>
+                    <td>${student.class}</td>
+                    <td>${student.neaTotal}</td>
+                    <td>${student.mock1}</td>
+                    <td>${student.mock2}</td>
+                    <td>${student.teamsLink ? `<a href="${student.teamsLink}" target="_blank" style="color: #2563eb;">Teams Link</a>` : '-'}</td>
+                    <td>
+                        <button onclick="editStudent(${student.id})" style="color: #2563eb; background: none; border: none; cursor: pointer; margin-right: 8px;">Edit</button>
+                        <button onclick="deleteStudent(${student.id})" style="color: #dc2626; background: none; border: none; cursor: pointer;">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddStudentModal() {
+            editingStudentId = null;
+            document.getElementById('student-modal-title').textContent = 'Add Student';
+            document.getElementById('student-form').reset();
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function editStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            editingStudentId = id;
+            document.getElementById('student-modal-title').textContent = 'Edit Student';
+            document.getElementById('student-name').value = student.name;
+            document.getElementById('student-class').value = student.class;
+            document.getElementById('student-nea').value = student.neaTotal;
+            document.getElementById('student-mock1').value = student.mock1;
+            document.getElementById('student-mock2').value = student.mock2;
+            document.getElementById('student-teams').value = student.teamsLink;
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function hideStudentModal() {
+            document.getElementById('student-modal').classList.add('hidden');
+            editingStudentId = null;
+        }
+
+        function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                students = students.filter(s => s.id !== id);
+                delete neaProgress[id];
+                delete pageProgress[id];
+                saveData();
+                updateStudentsTable();
+                updateDashboard();
+            }
+        }
+
+        // Progress functions
+        function showProgressTab(tab) {
+            document.querySelectorAll('.progress-tab').forEach(t => t.classList.add('hidden'));
+            document.getElementById('progress-' + tab).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-button').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('tab-inactive');
+            });
+            document.getElementById('tab-' + tab).classList.remove('tab-inactive');
+            document.getElementById('tab-' + tab).classList.add('tab-active');
+        }
+
+        function updateProgressTables() {
+            updateIndividualProgress();
+            updateOverallProgress();
+        }
+
+        function updateIndividualProgress() {
+            const tbody = document.getElementById('progress-table-body');
+            const sections = ['sectionA', 'sectionB', 'sectionC', 'sectionD', 'sectionE', 'sectionF'];
+            
+            tbody.innerHTML = students.map(student => {
+                const progress = neaProgress[student.id] || {};
+                return `
+                    <tr>
+                        <td style="position: sticky; left: 0; background: white; font-weight: 500;">${student.name}</td>
+                        ${sections.map(section => `
+                            <td style="text-align: center;">
+                                <input type="number" min="0" max="100" value="${progress[section] || 0}" 
+                                       style="width: 64px; padding: 4px; text-align: center; border: 1px solid #d1d5db; border-radius: 4px;"
+                                       onchange="updateNeaProgress(${student.id}, '${section}', this.value)">
+                            </td>
+                        `).join('')}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateOverallProgress() {
+            const tbody = document.getElementById('overall-table-body');
+            tbody.innerHTML = students.map(student => {
+                const progress = neaProgress[student.id] || {};
+                const neaTotal = Math.round(Object.values(progress).reduce((sum, val) => sum + (val || 0), 0) / 6);
+                const highestMock = Math.max(student.mock1, student.mock2);
+                const predictedExam = Math.round(highestMock * (1 + improvementPercentage / 100));
+                const overallGrade = Math.round((neaTotal + predictedExam) / 2);
+                
+                return `
+                    <tr>
+                        <td style="font-weight: 500;">${student.name}</td>
+                        <td style="text-align: center;">${neaTotal}</td>
+                        <td style="text-align: center;">${highestMock}</td>
+                        <td style="text-align: center;">
+                            <div style="${improvementPercentage > 0 ? 'color: #059669; font-weight: 500;' : ''}">
+                                ${predictedExam}
+                                ${improvementPercentage > 0 && predictedExam > highestMock ? `<div style="font-size: 12px; color: #10b981;">+${predictedExam - highestMock}</div>` : ''}
+                            </div>
+                        </td>
+                        <td style="text-align: center; font-weight: 600;">${overallGrade}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateNeaProgress(studentId, section, value) {
+            if (!neaProgress[studentId]) {
+                neaProgress[studentId] = {};
+            }
+            neaProgress[studentId][section] = Math.max(0, Math.min(100, parseInt(value) || 0));
+            saveData();
+            updateDashboard();
+            updateOverallProgress();
+        }
+
+        function updateImprovement(value) {
+            improvementPercentage = parseInt(value);
+            document.getElementById('improvement-value').textContent = value;
+            saveData();
+            updateOverallProgress();
+        }
+
+        // Page Tracker functions
+        function updatePageTracker() {
+            const tbody = document.getElementById('page-tracker-body');
+            const pageRanges = ['pages1_5', 'pages6_10', 'pages11_15', 'pages16_20', 'pages21_25', 'pages26_30'];
+            
+            tbody.innerHTML = students.map(student => {
+                const progress = pageProgress[student.id] || {};
+                return `
+                    <tr>
+                        <td style="position: sticky; left: 0; background: white; font-weight: 500;">${student.name}</td>
+                        ${pageRanges.map(range => `
+                            <td style="text-align: center;">
+                                <input type="number" min="0" max="100" value="${progress[range] || 0}" 
+                                       style="width: 64px; padding: 4px; text-align: center; border: 1px solid #d1d5db; border-radius: 4px;"
+                                       onchange="updatePageProgress(${student.id}, '${range}', this.value)">
+                            </td>
+                        `).join('')}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updatePageProgress(studentId, range, value) {
+            if (!pageProgress[studentId]) {
+                pageProgress[studentId] = {};
+            }
+            pageProgress[studentId][range] = Math.max(0, Math.min(100, parseInt(value) || 0));
+            saveData();
+        }
+
+        // Moderation functions
+        function updateModerationTable() {
+            const tbody = document.getElementById('moderation-table-body');
+            tbody.innerHTML = students.map(student => {
+                const isSelected = moderationList.includes(student.id);
+                return `
+                    <tr>
+                        <td style="font-weight: 500;">${student.name}</td>
+                        <td>${student.class}</td>
+                        <td style="text-align: center;">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                   onchange="toggleModeration(${student.id}, this.checked)">
+                        </td>
+                        <td style="text-align: center;">
+                            <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; ${isSelected ? 'background: #fef3c7; color: #92400e;' : 'background: #f3f4f6; color: #6b7280;'}">
+                                ${isSelected ? 'Selected' : 'Not Selected'}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="toggleModeration(${student.id}, ${!isSelected})" 
+                                    style="color: #2563eb; background: none; border: none; cursor: pointer;">
+                                ${isSelected ? 'Remove' : 'Select'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function selectRandomStudents() {
+            const count = Math.min(9, Math.ceil(students.length * 0.1)); // 10% or max 9
+            const shuffled = [...students].sort(() => 0.5 - Math.random());
+            moderationList = shuffled.slice(0, count).map(s => s.id);
+            saveData();
+            updateModerationTable();
+        }
+
+        function clearModeration() {
+            moderationList = [];
+            saveData();
+            updateModerationTable();
+        }
+
+        function toggleModeration(studentId, selected) {
+            if (selected) {
+                if (!moderationList.includes(studentId)) {
+                    moderationList.push(studentId);
+                }
+            } else {
+                moderationList = moderationList.filter(id => id !== studentId);
+            }
+            saveData();
+            updateModerationTable();
+        }
+
+        // Analytics functions
+        function updateAnalytics() {
+            updateClassAnalytics();
+            updateSectionAnalytics();
+        }
+
+        function updateClassAnalytics() {
+            const classes = {};
+            students.forEach(student => {
+                if (!classes[student.class]) {
+                    classes[student.class] = { count: 0, totalProgress: 0 };
+                }
+                classes[student.class].count++;
+                const progress = neaProgress[student.id];
+                if (progress) {
+                    const avg = Object.values(progress).reduce((a, b) => a + b, 0) / 6;
+                    classes[student.class].totalProgress += avg;
+                }
+            });
+
+            const html = Object.entries(classes).map(([className, data]) => {
+                const avgProgress = Math.round(data.totalProgress / data.count);
+                return `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>${className}</span>
+                        <span style="font-weight: 600;">${avgProgress}%</span>
+                    </div>
+                    <div class="progress-bar" style="margin-bottom: 12px;">
+                        <div class="progress-fill" style="width: ${avgProgress}%; background-color: #2563eb;"></div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('class-analytics').innerHTML = html;
+        }
+
+        function updateSectionAnalytics() {
+            const sections = [
+                { key: 'sectionA', name: 'Section A' },
+                { key: 'sectionB', name: 'Section B' },
+                { key: 'sectionC', name: 'Section C' },
+                { key: 'sectionD', name: 'Section D' },
+                { key: 'sectionE', name: 'Section E' },
+                { key: 'sectionF', name: 'Section F' }
+            ];
+
+            const html = sections.map(section => {
+                const percentage = getAverageForSection(section.key);
+                return `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>${section.name}</span>
+                        <span style="font-weight: 600;">${percentage}%</span>
+                    </div>
+                    <div class="progress-bar" style="margin-bottom: 12px;">
+                        <div class="progress-fill" style="width: ${percentage}%; background-color: #059669;"></div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('section-analytics').innerHTML = html;
+        }
+
+        // Deadlines functions
+        function updateDeadlinesTable() {
+            const tbody = document.getElementById('deadlines-table-body');
+            tbody.innerHTML = deadlines.map(deadline => `
+                <tr>
+                    <td style="font-weight: 500;">${deadline.task}</td>
+                    <td>${deadline.dueDate}</td>
+                    <td>
+                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; ${
+                            deadline.priority === 'High' ? 'background: #fecaca; color: #991b1b;' :
+                            deadline.priority === 'Medium' ? 'background: #fed7aa; color: #9a3412;' :
+                            'background: #d1fae5; color: #065f46;'
+                        }">
+                            ${deadline.priority}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; ${
+                            deadline.status === 'Complete' ? 'background: #d1fae5; color: #065f46;' :
+                            'background: #fef3c7; color: #92400e;'
+                        }">
+                            ${deadline.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="toggleDeadlineStatus(${deadline.id})" 
+                                style="color: #2563eb; background: none; border: none; cursor: pointer; margin-right: 8px;">
+                            ${deadline.status === 'Complete' ? 'Mark Pending' : 'Mark Complete'}
+                        </button>
+                        <button onclick="deleteDeadline(${deadline.id})" 
+                                style="color: #dc2626; background: none; border: none; cursor: pointer;">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddDeadlineModal() {
+            const task = prompt('Enter task name:');
+            if (!task) return;
+            
+            const dueDate = prompt('Enter due date (YYYY-MM-DD):');
+            if (!dueDate) return;
+            
+            const priority = prompt('Enter priority (High/Medium/Low):') || 'Medium';
+            
+            const newDeadline = {
+                id: Math.max(...deadlines.map(d => d.id), 0) + 1,
+                task,
+                dueDate,
+                priority,
+                status: 'Pending'
+            };
+            
+            deadlines.push(newDeadline);
+            saveData();
+            updateDeadlinesTable();
+        }
+
+        function toggleDeadlineStatus(id) {
+            const deadline = deadlines.find(d => d.id === id);
+            if (deadline) {
+                deadline.status = deadline.status === 'Complete' ? 'Pending' : 'Complete';
+                saveData();
+                updateDeadlinesTable();
+            }
+        }
+
+        function deleteDeadline(id) {
+            if (confirm('Are you sure you want to delete this deadline?')) {
+                deadlines = deadlines.filter(d => d.id !== id);
+                saveData();
+                updateDeadlinesTable();
+            }
+        }
+
+        // Settings functions
+        function exportData() {
+            const data = {
+                students,
+                neaProgress,
+                improvementPercentage,
+                deadlines,
+                moderationList,
+                pageProgress,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nea-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (confirm('This will replace all current data. Are you sure?')) {
+                            students = data.students || [];
+                            neaProgress = data.neaProgress || {};
+                            improvementPercentage = data.improvementPercentage || 15;
+                            deadlines = data.deadlines || [];
+                            moderationList = data.moderationList || [];
+                            pageProgress = data.pageProgress || {};
+                            saveData();
+                            location.reload();
+                        }
+                    } catch (error) {
+                        alert('Invalid file format');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('This will delete ALL data. Are you sure?')) {
+                if (confirm('This action cannot be undone. Continue?')) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+        }
+
+        // Form submission
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentData = {
+                name: document.getElementById('student-name').value,
+                class: document.getElementById('student-class').value,
+                neaTotal: parseInt(document.getElementById('student-nea').value) || 0,
+                mock1: parseInt(document.getElementById('student-mock1').value) || 0,
+                mock2: parseInt(document.getElementById('student-mock2').value) || 0,
+                teamsLink: document.getElementById('student-teams').value
+            };
+            
+            if (editingStudentId) {
+                // Edit existing student
+                const student = students.find(s => s.id === editingStudentId);
+                Object.assign(student, studentData);
+            } else {
+                // Add new student
+                const newStudent = {
+                    ...studentData,
+                    id: Math.max(...students.map(s => s.id), 0) + 1
+                };
+                students.push(newStudent);
+                
+                // Initialize progress data
+                neaProgress[newStudent.id] = {
+                    sectionA: 0, sectionB: 0, sectionC: 0,
+                    sectionD: 0, sectionE: 0, sectionF: 0
+                };
+                pageProgress[newStudent.id] = {
+                    pages1_5: 0, pages6_10: 0, pages11_15: 0,
+                    pages16_20: 0, pages21_25: 0, pages26_30: 0
+                };
+            }
+            
+            saveData();
+            hideStudentModal();
+            updateStudentsTable();
+            updateDashboard();
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('dashboard');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('student-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideStudentModal();
+            }
+        });
+    </script>
+</body>
+</html>

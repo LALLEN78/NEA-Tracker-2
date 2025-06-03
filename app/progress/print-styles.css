@@ -1,0 +1,188 @@
+@media print {
+  /* Set page size to A4 and adjust margins */
+  @page {
+    size: A4 portrait;
+    margin: 0.5cm;
+  }
+
+  /* Hide elements that shouldn't be printed */
+  .print-hidden,
+  nav,
+  header,
+  footer,
+  button,
+  .dialog-overlay {
+    display: none !important;
+  }
+
+  /* Make sure the dialog content is visible and properly formatted */
+  .printing-report .print-container,
+  .printing .print-container {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background-color: white !important;
+    color: black !important;
+    z-index: 9999 !important;
+    padding: 0.5cm !important;
+    max-height: 27.7cm !important; /* A4 height minus margins */
+    font-size: 10pt !important;
+  }
+
+  /* Ensure dialog content is visible */
+  .printing-report [role="dialog"],
+  .printing [role="dialog"] {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+    max-height: none !important;
+    max-width: none !important;
+    overflow: visible !important;
+    display: block !important;
+    background-color: white !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure cards print properly and are more compact */
+  .printing-report .card,
+  .printing .card {
+    break-inside: avoid;
+    border: 1px solid #ddd !important;
+    margin-bottom: 0.3rem !important;
+    page-break-inside: avoid !important;
+    background-color: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    padding: 0.3rem !important;
+  }
+
+  /* Make card headers more compact */
+  .printing-report .card-header,
+  .printing .card-header {
+    padding: 0.3rem !important;
+  }
+
+  /* Make card content more compact */
+  .printing-report .card-content,
+  .printing .card-content {
+    padding: 0.3rem !important;
+  }
+
+  /* Reduce spacing between elements */
+  .printing-report .space-y-4,
+  .printing .space-y-4 {
+    margin-top: 0.3rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  /* Ensure progress bars print with color */
+  .printing-report .progress,
+  .printing .progress {
+    border: 1px solid #ddd !important;
+    background-color: #f0f0f0 !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    height: 0.5rem !important;
+  }
+
+  .printing-report .progress > div,
+  .printing .progress > div {
+    background-color: #4f46e5 !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Ensure text is readable but compact */
+  .printing-report *,
+  .printing * {
+    color: black !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Adjust font sizes for print */
+  .printing-report h1,
+  .printing h1 {
+    font-size: 16pt !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .printing-report h2,
+  .printing h2 {
+    font-size: 14pt !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .printing-report h3,
+  .printing h3 {
+    font-size: 12pt !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .printing-report p,
+  .printing p,
+  .printing-report div,
+  .printing div {
+    font-size: 10pt !important;
+  }
+
+  .printing-report .text-sm,
+  .printing .text-sm {
+    font-size: 9pt !important;
+  }
+
+  .printing-report .text-xs,
+  .printing .text-xs {
+    font-size: 8pt !important;
+  }
+
+  /* Ensure no page breaks within the report */
+  .printing-report .print-container,
+  .printing .print-container {
+    page-break-inside: avoid !important;
+  }
+
+  /* Make grid more compact for print */
+  .printing-report .grid,
+  .printing .grid {
+    display: grid !important;
+    grid-gap: 0.3rem !important;
+  }
+
+  /* Adjust avatar size */
+  .printing-report .avatar,
+  .printing .avatar {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+
+  /* Hide sidebar and other navigation elements */
+  .printing-report [class*="sidebar"],
+  .printing-report nav,
+  .printing-report .nav,
+  .printing-report .navigation,
+  .printing [class*="sidebar"],
+  .printing nav,
+  .printing .nav,
+  .printing .navigation {
+    display: none !important;
+  }
+
+  /* Ensure teacher notes section is not too tall */
+  .printing-report .teacher-notes,
+  .printing .teacher-notes {
+    min-height: 50px !important;
+    max-height: 50px !important;
+  }
+}

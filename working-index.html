@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEA Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1e293b;
+            color: white;
+            padding: 0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .nav-menu {
+            padding: 16px 0;
+        }
+        
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #334155;
+            color: white;
+            border-left-color: #3b82f6;
+        }
+        
+        .nav-item.active {
+            background: #334155;
+            color: white;
+            border-left-color: #3b82f6;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            color: #64748b;
+            margin-top: 8px;
+        }
+        
+        .btn {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .stat-subtitle {
+            color: #16a34a;
+            font-size: 12px;
+        }
+        
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+        
+        .progress-section {
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-fill.high { background: #10b981; }
+        .progress-fill.medium { background: #f59e0b; }
+        .progress-fill.low { background: #ef4444; }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .table th {
+            background: #f8fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table td {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .form-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .form-modal {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>📚 NEA Tracker</h1>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" onclick="showPage('dashboard')">
+                    📊 Dashboard
+                </button>
+                <button class="nav-item" onclick="showPage('students')">
+                    👥 Students
+                </button>
+                <button class="nav-item" onclick="showPage('progress')">
+                    📈 Progress
+                </button>
+                <button class="nav-item" onclick="showPage('analytics')">
+                    📋 Analytics
+                </button>
+                <button class="nav-item" onclick="showPage('deadlines')">
+                    📅 Deadlines
+                </button>
+                <button class="nav-item" onclick="showPage('settings')">
+                    ⚙️ Settings
+                </button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="header">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p>Welcome to the NEA Coursework Tracker</p>
+                    </div>
+                    <button class="btn" onclick="window.print()">Print Report</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">25</div>
+                        <div class="stat-label">Total Students</div>
+                        <div class="stat-subtitle">Across 3 classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">68%</div>
+                        <div class="stat-label">Overall Progress</div>
+                        <div class="stat-subtitle">+5% from last month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">18/25</div>
+                        <div class="stat-label">Students On Target</div>
+                        <div class="stat-subtitle">72% meeting targets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">+12%</div>
+                        <div class="stat-label">Improvement Rate</div>
+                        <div class="stat-subtitle">Positive trend</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 style="margin-bottom: 16px;">Progress by NEA Section</h2>
+                    <p style="color: #64748b; margin-bottom: 24px;">Average completion percentage across all students</p>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span style="font-weight: 500;">Section A: Identifying & Investigating</span>
+                            <span style="font-weight: 600;">85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill high" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span style="font-weight: 500;">Section B: Producing a Design Brief</span>
+                            <span style="font-weight: 600;">78%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill high" style="width: 78%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span style="font-weight: 500;">Section C: Generating Design Ideas</span>
+                            <span style="font-weight: 600;">72%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill high" style="width: 72%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span style="font-weight: 500;">Section D: Developing Design Ideas</span>
+                            <span style="font-weight: 600;">65%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill medium" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span style="font-weight: 500;">Section E: Realising Design Ideas</span>
+                            <span style="font-weight: 600;">48%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill medium" style="width: 48%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span style="font-weight: 500;">Section F: Analysing & Evaluating</span>
+                            <span style="font-weight: 600;">35%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill low" style="width: 35%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Page -->
+            <div id="students" class="page">
+                <div class="header">
+                    <div>
+                        <h1>Students</h1>
+                        <p>Manage student information and scores</p>
+                    </div>
+                    <button class="btn" onclick="showAddStudentForm()">Add Student</button>
+                </div>
+
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>NEA Total</th>
+                                <th>Mock 1</th>
+                                <th>Mock 2</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <tr>
+                                <td>Alice Johnson</td>
+                                <td>11A</td>
+                                <td>45</td>
+                                <td>67</td>
+                                <td>72</td>
+                                <td>
+                                    <button class="btn" style="padding: 6px 12px; font-size: 14px; margin-right: 8px;">Edit</button>
+                                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 14px;">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Bob Smith</td>
+                                <td>11A</td>
+                                <td>38</td>
+                                <td>58</td>
+                                <td>65</td>
+                                <td>
+                                    <button class="btn" style="padding: 6px 12px; font-size: 14px; margin-right: 8px;">Edit</button>
+                                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 14px;">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Charlie Brown</td>
+                                <td>11B</td>
+                                <td>52</td>
+                                <td>74</td>
+                                <td>78</td>
+                                <td>
+                                    <button class="btn" style="padding: 6px 12px; font-size: 14px; margin-right: 8px;">Edit</button>
+                                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 14px;">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Progress Page -->
+            <div id="progress" class="page">
+                <div class="header">
+                    <div>
+                        <h1>Progress Tracking</h1>
+                        <p>Track individual student progress through NEA sections</p>
+                    </div>
+                    <button class="btn" onclick="window.print()">Print Progress</button>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 16px;">Individual Progress</h3>
+                    <p style="color: #64748b; margin-bottom: 24px;">Update progress for each NEA section</p>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Section A</th>
+                                <th>Section B</th>
+                                <th>Section C</th>
+                                <th>Section D</th>
+                                <th>Section E</th>
+                                <th>Section F</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: 600;">Alice Johnson</td>
+                                <td><input type="number" class="form-input" value="85" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="78" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="72" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="65" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="48" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="35" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600;">Bob Smith</td>
+                                <td><input type="number" class="form-input" value="75" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="68" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="62" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="55" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="38" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                                <td><input type="number" class="form-input" value="25" min="0" max="100" style="width: 80px; padding: 4px 8px;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics" class="page">
+                <div class="header">
+                    <div>
+                        <h1>Analytics</h1>
+                        <p>Performance analytics and insights</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Performance Analytics</h3>
+                    <p style="color: #64748b; margin-top: 8px;">Detailed analytics and reporting features will be available here.</p>
+                </div>
+            </div>
+
+            <!-- Deadlines Page -->
+            <div id="deadlines" class="page">
+                <div class="header">
+                    <div>
+                        <h1>Deadlines</h1>
+                        <p>Manage important dates and deadlines</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Deadline Management</h3>
+                    <p style="color: #64748b; margin-top: 8px;">Deadline tracking and management features will be available here.</p>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page">
+                <div class="header">
+                    <div>
+                        <h1>Settings</h1>
+                        <p>Application configuration and preferences</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Application Settings</h3>
+                    <p style="color: #64748b; margin-top: 8px;">Configuration options will be available here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Form Modal -->
+    <div id="add-student-modal" class="form-overlay hidden">
+        <div class="form-modal">
+            <h2 style="margin-bottom: 24px;">Add New Student</h2>
+            <form id="add-student-form">
+                <div class="form-group">
+                    <label class="form-label">Student Name</label>
+                    <input type="text" class="form-input" id="student-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Class</label>
+                    <input type="text" class="form-input" id="student-class" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">NEA Total</label>
+                    <input type="number" class="form-input" id="student-nea" min="0" max="100" value="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mock 1 Score</label>
+                    <input type="number" class="form-input" id="student-mock1" min="0" max="100" value="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mock 2 Score</label>
+                    <input type="number" class="form-input" id="student-mock2" min="0" max="100" value="0">
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn" style="flex: 1;">Add Student</button>
+                    <button type="button" class="btn-secondary" style="flex: 1;" onclick="hideAddStudentForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected page
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
+            
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+        }
+
+        // Student form functionality
+        function showAddStudentForm() {
+            document.getElementById('add-student-modal').classList.remove('hidden');
+        }
+
+        function hideAddStudentForm() {
+            document.getElementById('add-student-modal').classList.add('hidden');
+            document.getElementById('add-student-form').reset();
+        }
+
+        // Handle form submission
+        document.getElementById('add-student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('student-name').value;
+            const studentClass = document.getElementById('student-class').value;
+            const nea = document.getElementById('student-nea').value;
+            const mock1 = document.getElementById('student-mock1').value;
+            const mock2 = document.getElementById('student-mock2').value;
+            
+            // Add new row to table
+            const tableBody = document.getElementById('students-table-body');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${name}</td>
+                <td>${studentClass}</td>
+                <td>${nea}</td>
+                <td>${mock1}</td>
+                <td>${mock2}</td>
+                <td>
+                    <button class="btn" style="padding: 6px 12px; font-size: 14px; margin-right: 8px;">Edit</button>
+                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="this.parentElement.parentElement.remove()">Delete</button>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+            
+            // Hide form and reset
+            hideAddStudentForm();
+            
+            alert('Student added successfully!');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('add-student-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAddStudentForm();
+            }
+        });
+
+        // Initialize the application
+        console.log('NEA Tracker loaded successfully!');
+    </script>
+</body>
+</html>

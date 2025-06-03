@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+    <header>
+        <h1>Grade Tracker</h1>
+    </header>
+
+    <main>
+        <section id="classes">
+            <h2>Classes</h2>
+            <button id="addClassButton">Add Class</button>
+            <div id="classList">
+                <p id="noClassesMessage">No classes added yet. Click "Add Class" to get started.</p>
+            </div>
+        </section>
+
+        <section id="assignments">
+            <h2>Assignments</h2>
+            <div id="assignmentList">
+                <p id="noAssignmentsMessage">No assignments added yet. Select a class to add assignments.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Grade Tracker</p>
+    </footer>
+
+    <div id="addClassModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add New Class</h2>
+            <label for="className">Class Name:</label>
+            <input type="text" id="className" name="className">
+            <label for="classCredits">Credits:</label>
+            <input type="number" id="classCredits" name="classCredits" value="3">
+            <button id="saveClassButton">Save Class</button>
+        </div>
+    </div>
+
+    <div id="addAssignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add New Assignment</h2>
+            <label for="assignmentName">Assignment Name:</label>
+            <input type="text" id="assignmentName" name="assignmentName">
+            <label for="assignmentGrade">Grade:</label>
+            <input type="number" id="assignmentGrade" name="assignmentGrade" value="100">
+            <label for="assignmentTotal">Total Points:</label>
+            <input type="number" id="assignmentTotal" name="assignmentTotal" value="100">
+            <button id="saveAssignmentButton">Save Assignment</button>
+        </div>
+    </div>
+
+    <script>
+        // Theme Preference
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const theme = localStorage.getItem('theme') ?? systemTheme;
+        document.documentElement.setAttribute('data-theme', theme);
+
+        // Modal functionality
+        const addClassModal = document.getElementById("addClassModal");
+        const addAssignmentModal = document.getElementById("addAssignmentModal");
+        const addClassButton = document.getElementById("addClassButton");
+        const classList = document.getElementById("classList");
+        const assignmentList = document.getElementById("assignmentList");
+        const saveClassButton = document.getElementById("saveClassButton");
+        const saveAssignmentButton = document.getElementById("saveAssignmentButton");
+        const classNameInput = document.getElementById("className");
+        const classCreditsInput = document.getElementById("classCredits");
+        const assignmentNameInput = document.getElementById("assignmentName");
+        const assignmentGradeInput = document.getElementById("assignmentGrade");
+        const assignmentTotalInput = document.getElementById("assignmentTotal");
+        const noClassesMessage = document.getElementById("noClassesMessage");
+        const noAssignmentsMessage = document.getElementById("noAssignmentsMessage");
+
+        let selectedClassId = null;
+
+        // Load classes from local storage
+        let classes = JSON.parse(localStorage.getItem('classes')) || [];
+        renderClasses();
+
+        // Event listeners
+        addClassButton.addEventListener("click", () => {
+            addClassModal.style.display = "block";
+        });
+
+        saveClassButton.addEventListener("click", () => {
+            const className = classNameInput.value;
+            const classCredits = parseInt(classCreditsInput.value);
+
+            if (className) {
+                const newClass = {
+                    id: Date.now(),
+                    name: className,
+                    credits: classCredits
+                };
+                classes.push(newClass);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                renderClasses();
+                classNameInput.value = "";
+                classCreditsInput.value = "3";
+                addClassModal.style.display = "none";
+            }
+        });
+
+        saveAssignmentButton.addEventListener("click", () => {
+            const assignmentName = assignmentNameInput.value;
+            const assignmentGrade = parseFloat(assignmentGradeInput.value);
+            const assignmentTotal = parseFloat(assignmentTotalInput.value);
+
+            if (assignmentName && selectedClassId) {
+                const selectedClass = classes.find(c => c.id === selectedClassId);
+                if (!selectedClass.assignments) {
+                    selectedClass.assignments = [];
+                }
+
+                const newAssignment = {
+                    id: Date.now(),
+                    name: assignmentName,
+                    grade: assignmentGrade,
+                    total: assignmentTotal
+                };
+
+                selectedClass.assignments.push(newAssignment);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                renderAssignments(selectedClassId);
+                assignmentNameInput.value = "";
+                assignmentGradeInput.value = "100";
+                assignmentTotalInput.value = "100";
+                addAssignmentModal.style.display = "none";
+            }
+        });
+
+        // Close modal functionality
+        document.querySelectorAll('.close').forEach(closeButton => {
+            closeButton.addEventListener('click', () => {
+                closeButton.closest('.modal').style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+
+        // Render functions
+        function renderClasses() {
+            classList.innerHTML = "";
+            if (classes.length === 0) {
+                classList.appendChild(noClassesMessage);
+                noClassesMessage.style.display = "block";
+            } else {
+                noClassesMessage.style.display = "none";
+                classes.forEach(c => {
+                    const classDiv = document.createElement("div");
+                    classDiv.classList.add("class-item");
+                    classDiv.textContent = c.name;
+                    classDiv.addEventListener("click", () => {
+                        selectedClassId = c.id;
+                        renderAssignments(c.id);
+                    });
+                    classList.appendChild(classDiv);
+                });
+            }
+        }
+
+        function renderAssignments(classId) {
+            assignmentList.innerHTML = "";
+            const selectedClass = classes.find(c => c.id === classId);
+
+            if (selectedClass && selectedClass.assignments && selectedClass.assignments.length > 0) {
+                noAssignmentsMessage.style.display = "none";
+                selectedClass.assignments.forEach(assignment => {
+                    const assignmentDiv = document.createElement("div");
+                    assignmentDiv.classList.add("assignment-item");
+                    assignmentDiv.textContent = `${assignment.name}: ${assignment.grade}/${assignment.total}`;
+                    assignmentList.appendChild(assignmentDiv);
+                });
+                const addAssignmentButton = document.createElement("button");
+                addAssignmentButton.textContent = "Add Assignment";
+                addAssignmentButton.addEventListener("click", () => {
+                    addAssignmentModal.style.display = "block";
+                });
+                assignmentList.appendChild(addAssignmentButton);
+
+            } else {
+                noAssignmentsMessage.style.display = "block";
+                const addAssignmentButton = document.createElement("button");
+                addAssignmentButton.textContent = "Add Assignment";
+                addAssignmentButton.addEventListener("click", () => {
+                    addAssignmentModal.style.display = "block";
+                });
+                assignmentList.appendChild(addAssignmentButton);
+            }
+        }
+    </script>
+</body>
+</html>
