@@ -11,24 +11,23 @@ import { useToast } from "@/components/ui/use-toast"
 const defaultChallenges = [
   {
     id: "1",
-    title: "Supporting Charities",
-    description:
-      "Design and develop a product that supports charitable causes and helps raise awareness or funds for important social issues.",
+    title: "Sustainable Living",
+    description: "Design and develop a product that promotes sustainable living and reduces environmental impact.",
     releaseDate: "2025-06-01",
     academicYear: "2025-2026",
   },
   {
     id: "2",
-    title: "Reducing Waste",
-    description: "Design and develop a product that helps reduce waste in the home, school, or community environment.",
+    title: "Inclusive Design",
+    description:
+      "Design and develop a product that addresses the needs of users with disabilities or limited mobility.",
     releaseDate: "2025-06-01",
     academicYear: "2025-2026",
   },
   {
     id: "3",
-    title: "Products to Help in the Home",
-    description:
-      "Design and develop a product that makes daily tasks easier or improves quality of life in the home environment.",
+    title: "Future Learning",
+    description: "Design and develop a product that enhances learning experiences in educational environments.",
     releaseDate: "2025-06-01",
     academicYear: "2025-2026",
   },

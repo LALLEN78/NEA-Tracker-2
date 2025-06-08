@@ -91,10 +91,7 @@ export default function StudentReport({ student, studentScores = {}, portfolioPr
         <head>
           <title>Progress Report - ${student.name}</title>
           <style>
-            @page { 
-              size: A4 portrait; 
-              margin: 5mm; /* Reduced margins */
-            }
+            @page { size: A4 portrait; margin: 10mm; }
             * { box-sizing: border-box; }
             body { 
               font-family: Arial, sans-serif; 
@@ -103,6 +100,23 @@ export default function StudentReport({ student, studentScores = {}, portfolioPr
               margin: 0; 
               color: #333;
               background-color: white;
+            }
+            .report-header { 
+              text-align: center; 
+              margin-bottom: 10px; 
+              border-bottom: 2px solid #2563eb; 
+              padding-bottom: 8px; 
+            }
+            .report-header h1 { 
+              font-size: 18px; 
+              margin: 0 0 2px 0; 
+              color: #2563eb;
+            }
+            .report-header h2 { 
+              font-size: 12px; 
+              margin: 0; 
+              color: #666;
+              font-weight: normal;
             }
             .student-info { 
               background-color: #f8fafc; 
@@ -264,24 +278,32 @@ export default function StudentReport({ student, studentScores = {}, portfolioPr
               font-size: 9px;
               break-inside: avoid;
             }
+            .footer {
+              margin-top: 10px;
+              text-align: center;
+              font-size: 8px;
+              color: #6b7280;
+              padding-top: 5px;
+              border-top: 1px solid #e5e7eb;
+            }
             @media print {
-              body { 
-                margin: 0; 
-                padding: 0;
-              }
+              body { margin: 0; }
               .no-print { display: none; }
-              * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             }
           </style>
         </head>
         <body>
-          
+          <div class="report-header">
+            <h1>My NEA Progress Report</h1>
+            <h2>Design & Technology GCSE</h2>
+          </div>
 
           <div class="student-info">
             <div class="student-name">${student.name}</div>
             <div class="student-details">
               <span class="student-detail">Class: ${student.class || "N/A"}</span>
               <span class="student-detail">Target: ${targetGrade}</span>
+              <span class="student-detail">Date: ${new Date().toLocaleDateString()}</span>
             </div>
           </div>
 
@@ -372,14 +394,14 @@ export default function StudentReport({ student, studentScores = {}, portfolioPr
             </div>
           </div>
 
-          
+          <div class="footer">
+            Generated on ${new Date().toLocaleDateString()} | Design & Technology GCSE | Next review in 2 weeks
+          </div>
         </body>
         </html>
       `)
       printWindow.document.close()
-      setTimeout(() => {
-        printWindow.print()
-      }, 500)
+      printWindow.print()
     }
   }
 

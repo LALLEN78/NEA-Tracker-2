@@ -25,8 +25,8 @@ import {
   Upload,
   Save,
   HardDrive,
+  Lightbulb,
   BookOpenCheck,
-  Printer,
 } from "lucide-react"
 import { createBackup, loadBackupFromFile, hasUnsavedChanges, autoSave } from "../data"
 import { ThemeSelector } from "./theme-selector"
@@ -44,7 +44,7 @@ const navigation = [
   { name: "Rewards", href: "/rewards", icon: Award },
   { name: "Analytics", href: "/analytics", icon: PresentationChart },
   { name: "Contextual Challenges", href: "/contextual-challenges", icon: Clipboard },
-  { name: "Printable Resources", href: "/printable-resources", icon: Printer },
+  { name: "Project Ideas", href: "/project-ideas", icon: Lightbulb },
   { name: "Whiteboard", href: "/whiteboard", icon: FileText },
   { name: "Student Log", href: "/student-log", icon: FileText },
   { name: "Moderation", href: "/moderation", icon: Clipboard },

@@ -2,25 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import {
-  Trophy,
-  Star,
-  Crown,
-  Target,
-  Award,
-  TrendingUp,
-  CheckCircle2,
-  BookOpen,
-  FileText,
-  Lightbulb,
-  Cog,
-  TestTube,
-  BarChart3,
-  Clock,
-} from "lucide-react"
+import { Trophy, Star, Crown, Target, Award, TrendingUp, CheckCircle2 } from "lucide-react"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 
@@ -32,162 +17,7 @@ export default function ProjectorView() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [autoSlide, setAutoSlide] = useState(true)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [selectedUnit, setSelectedUnit] = useState("section-a")
   const searchParams = useSearchParams()
-
-  // NEA Unit Details for Projector View
-  const neaUnits = [
-    {
-      id: "section-a",
-      title: "Section A: Identifying & Investigating",
-      marks: 10,
-      icon: BookOpen,
-      color: "bg-green-500",
-      timeframe: "2-3 weeks",
-      pages: "4-6 pages",
-      whatToInclude: [
-        "Clear identification of a design problem or opportunity",
-        "Research into existing products and solutions",
-        "User needs analysis and target market identification",
-        "Analysis of design requirements and constraints",
-        "Primary and secondary research evidence",
-        "Clear justification for the chosen design context",
-      ],
-      keyTips: [
-        "Start with a real problem that affects real people",
-        "Use variety of research methods (surveys, interviews)",
-        "Include images and examples of existing products",
-        "Show clear analysis, don't just describe",
-        "Make sure research leads to design opportunities",
-      ],
-      assessmentFocus: "Research quality, analysis depth, problem identification",
-    },
-    {
-      id: "section-b",
-      title: "Section B: Producing a Design Brief",
-      marks: 10,
-      icon: FileText,
-      color: "bg-blue-500",
-      timeframe: "1-2 weeks",
-      pages: "3-4 pages",
-      whatToInclude: [
-        "Clear, concise design brief based on Section A research",
-        "Detailed design specification with measurable criteria",
-        "Prioritized list of design requirements",
-        "Consideration of constraints and limitations",
-        "Success criteria for evaluation",
-        "Clear link back to user needs identified in Section A",
-      ],
-      keyTips: [
-        "Keep the brief concise but comprehensive",
-        "Make specification points measurable where possible",
-        "Prioritize requirements (essential vs. desirable)",
-        "Consider all constraints (time, materials, skills, cost)",
-        "Think about how you'll test each specification point",
-      ],
-      assessmentFocus: "Brief clarity, specification detail, justified priorities",
-    },
-    {
-      id: "section-c",
-      title: "Section C: Generating Design Ideas",
-      marks: 20,
-      icon: Lightbulb,
-      color: "bg-purple-500",
-      timeframe: "3-4 weeks",
-      pages: "8-12 pages",
-      whatToInclude: [
-        "Wide range of initial design ideas (minimum 6-8 concepts)",
-        "Clear sketches with annotations explaining key features",
-        "Evidence of creative thinking and innovation",
-        "Ideas that address the design brief and specification",
-        "Initial evaluation against specification criteria",
-        "Selection and justification of ideas to develop further",
-      ],
-      keyTips: [
-        "Generate quantity first, then focus on quality",
-        "Use different ideation techniques (mind mapping, SCAMPER)",
-        "Annotate sketches clearly to explain your thinking",
-        "Don't be afraid of 'crazy' ideas - they lead to innovation",
-        "Show how ideas meet different specification points",
-      ],
-      assessmentFocus: "Creativity, range of ideas, sketch quality, evaluation",
-    },
-    {
-      id: "section-d",
-      title: "Section D: Developing Design Ideas",
-      marks: 20,
-      icon: Cog,
-      color: "bg-orange-500",
-      timeframe: "4-5 weeks",
-      pages: "8-12 pages",
-      whatToInclude: [
-        "Detailed development of selected design ideas",
-        "Technical drawings and detailed sketches",
-        "Material and component selection with justification",
-        "Manufacturing considerations and processes",
-        "Modeling and testing of key features",
-        "Final design solution with full specifications",
-      ],
-      keyTips: [
-        "Show clear progression from initial ideas to final design",
-        "Include technical details like dimensions and materials",
-        "Test ideas through modeling (physical or digital)",
-        "Consider manufacturing methods and feasibility",
-        "Document all design decisions and justifications",
-      ],
-      assessmentFocus: "Development quality, technical detail, justification",
-    },
-    {
-      id: "section-e",
-      title: "Section E: Realising Design Ideas",
-      marks: 20,
-      icon: TestTube,
-      color: "bg-yellow-500",
-      timeframe: "4-6 weeks",
-      pages: "6-10 pages",
-      whatToInclude: [
-        "Detailed manufacturing plan with timeline",
-        "Step-by-step documentation of making process",
-        "Photos showing key stages of manufacture",
-        "Problems encountered and solutions implemented",
-        "Quality control checks and modifications made",
-        "Final prototype with evaluation against specification",
-      ],
-      keyTips: [
-        "Plan your making carefully before starting",
-        "Document everything with photos and notes",
-        "Don't hide problems - show how you solved them",
-        "Check quality regularly during making",
-        "Be prepared to modify your design if needed",
-      ],
-      assessmentFocus: "Planning, manufacturing skills, problem solving",
-    },
-    {
-      id: "section-f",
-      title: "Section F: Analysing & Evaluating",
-      marks: 20,
-      icon: BarChart3,
-      color: "bg-red-500",
-      timeframe: "2-3 weeks",
-      pages: "6-8 pages",
-      whatToInclude: [
-        "Comprehensive testing of prototype against specification",
-        "User testing with target audience",
-        "Analysis of test results with data and evidence",
-        "Evaluation of design decisions made throughout project",
-        "Identification of improvements and modifications",
-        "Reflection on the design process and learning",
-      ],
-      keyTips: [
-        "Test every specification point systematically",
-        "Get feedback from real users in your target market",
-        "Use data and evidence to support your evaluation",
-        "Be honest about what worked and what didn't",
-        "Suggest realistic improvements based on findings",
-      ],
-      assessmentFocus: "Testing thoroughness, analysis quality, reflection",
-    },
-  ]
 
   // Load real student data and scores
   useEffect(() => {
@@ -236,10 +66,10 @@ export default function ProjectorView() {
     if (!autoSlide) return
 
     const slideInterval = setInterval(() => {
-      const tabs = ["leaderboard", "achievements", "nea-breakdown", "unit-guides", "class-progress"]
+      const tabs = ["leaderboard", "achievements", "nea-breakdown", "class-progress"]
       const nextIndex = (tabs.indexOf(activeTab) + 1) % tabs.length
       setActiveTab(tabs[nextIndex])
-    }, 25000) // Change slide every 25 seconds
+    }, 20000) // Change slide every 20 seconds
 
     return () => clearInterval(slideInterval)
   }, [activeTab, autoSlide])
@@ -544,7 +374,6 @@ export default function ProjectorView() {
   const topPerformers = getTopPerformers()
   const recentAchievements = getRecentAchievements()
   const neaSectionBreakdown = getNeaSectionBreakdown()
-  const selectedUnitData = neaUnits.find((unit) => unit.id === selectedUnit)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white p-6">
@@ -581,7 +410,6 @@ export default function ProjectorView() {
             { id: "leaderboard", label: "Target Progress", icon: Target },
             { id: "achievements", label: "Achievements", icon: Trophy },
             { id: "nea-breakdown", label: "NEA Breakdown", icon: CheckCircle2 },
-            { id: "unit-guides", label: "Unit Guides", icon: BookOpen },
             { id: "class-progress", label: "Class Progress", icon: TrendingUp },
           ].map((tab) => (
             <button
@@ -843,144 +671,6 @@ export default function ProjectorView() {
                   </motion.div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Unit Guides */}
-          {activeTab === "unit-guides" && (
-            <div className="space-y-8">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-2">NEA Unit Guides</h2>
-                <p className="text-xl text-blue-200">Detailed breakdown of what goes into each NEA section</p>
-              </div>
-
-              {/* Unit Selector */}
-              <div className="flex justify-center mb-8">
-                <div className="inline-flex bg-white/10 backdrop-blur-sm rounded-full p-1 flex-wrap">
-                  {neaUnits.map((unit) => (
-                    <button
-                      key={unit.id}
-                      onClick={() => setSelectedUnit(unit.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all m-1 ${
-                        selectedUnit === unit.id
-                          ? "bg-white text-blue-900 shadow-lg"
-                          : "text-white/80 hover:bg-white/20"
-                      }`}
-                    >
-                      <unit.icon className="h-4 w-4" />
-                      <span className="font-medium text-sm">Section {unit.id.split("-")[1].toUpperCase()}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Selected Unit Details */}
-              {selectedUnitData && (
-                <motion.div
-                  key={selectedUnit}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-6"
-                >
-                  {/* Unit Header */}
-                  <Card className="bg-white/10 backdrop-blur-md border-none shadow-xl">
-                    <CardHeader>
-                      <div className="flex items-center gap-4">
-                        <div className={`rounded-full p-4 ${selectedUnitData.color} text-white`}>
-                          <selectedUnitData.icon className="h-8 w-8" />
-                        </div>
-                        <div className="flex-1">
-                          <CardTitle className="text-3xl">{selectedUnitData.title}</CardTitle>
-                          <div className="flex items-center gap-6 mt-2 text-blue-200">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4" />
-                              <span>{selectedUnitData.timeframe}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <FileText className="h-4 w-4" />
-                              <span>{selectedUnitData.pages}</span>
-                            </div>
-                            <Badge variant="secondary" className="text-lg px-3 py-1">
-                              {selectedUnitData.marks} marks
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-
-                  {/* Content Grid */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* What to Include */}
-                    <Card className="bg-white/10 backdrop-blur-md border-none shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-xl">
-                          <CheckCircle2 className="h-6 w-6 text-green-400" />
-                          What to Include
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-3">
-                          {selectedUnitData.whatToInclude.map((item, index) => (
-                            <motion.li
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.1 }}
-                              className="flex items-start gap-3"
-                            >
-                              <CheckCircle2 className="h-4 w-4 text-green-400 mt-1 flex-shrink-0" />
-                              <span className="text-sm">{item}</span>
-                            </motion.li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-
-                    {/* Key Tips */}
-                    <Card className="bg-white/10 backdrop-blur-md border-none shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-xl">
-                          <Lightbulb className="h-6 w-6 text-yellow-400" />
-                          Key Tips for Success
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-3">
-                          {selectedUnitData.keyTips.map((tip, index) => (
-                            <motion.li
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.1 }}
-                              className="flex items-start gap-3"
-                            >
-                              <Lightbulb className="h-4 w-4 text-yellow-400 mt-1 flex-shrink-0" />
-                              <span className="text-sm">{tip}</span>
-                            </motion.li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Assessment Focus */}
-                  <Card className="bg-white/10 backdrop-blur-md border-none shadow-xl">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-xl">
-                        <BarChart3 className="h-6 w-6 text-purple-400" />
-                        Assessment Focus
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-white/5 p-4 rounded-lg">
-                        <p className="text-lg font-medium text-center">{selectedUnitData.assessmentFocus}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           )}
 

@@ -15,14 +15,6 @@ import { Progress } from "@/components/ui/progress"
 import Link from "next/link"
 import StudentReport from "./print-helper"
 
-const challengeOptions = [
-  { value: "", label: "Select Challenge..." },
-  { value: "supporting-charities", label: "Supporting Charities" },
-  { value: "reducing-waste", label: "Reducing Waste" },
-  { value: "home-products", label: "Home Products" },
-  { value: "custom", label: "Custom Challenge" },
-]
-
 const neaSections = [
   { id: "section-a", name: "Section A", maxMarks: 10 },
   { id: "section-b", name: "Section B", maxMarks: 10 },
@@ -84,7 +76,7 @@ export default function ProgressPage() {
 
   // Handle score change (including notes and portfolio links)
   const handleScoreChange = (studentId, field, value) => {
-    if (field === "notes" || field === "portfolioLink" || field === "challenge" || field === "projectDescription") {
+    if (field === "notes" || field === "portfolioLink") {
       // Handle text fields
       setStudentScores((prev) => {
         const updated = {
@@ -399,8 +391,6 @@ export default function ProgressPage() {
                       <th className="p-4 font-medium text-center">Grade</th>
                       <th className="p-4 font-medium text-center">Notes</th>
                       <th className="p-4 font-medium text-center">Portfolio Link</th>
-                      <th className="p-4 font-medium text-center">Challenge</th>
-                      <th className="p-4 font-medium text-center">Project Description</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -466,28 +456,6 @@ export default function ProgressPage() {
                                 </Button>
                               )}
                             </div>
-                          </td>
-                          <td className="p-4 text-center">
-                            <select
-                              value={studentScores[student.id]?.challenge || ""}
-                              onChange={(e) => handleScoreChange(student.id, "challenge", e.target.value)}
-                              className="w-40 p-2 border border-input bg-background text-sm rounded-md"
-                            >
-                              {challengeOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td className="p-4 text-center">
-                            <textarea
-                              placeholder="Describe the project..."
-                              value={studentScores[student.id]?.projectDescription || ""}
-                              onChange={(e) => handleScoreChange(student.id, "projectDescription", e.target.value)}
-                              className="w-48 h-20 p-2 border border-input bg-background text-sm rounded-md resize-none"
-                              rows={3}
-                            />
                           </td>
                         </tr>
                       )
